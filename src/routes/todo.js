@@ -57,5 +57,19 @@ router.patch(
     } 
 )
 
+router.delete(
+    '/:id',
+    auth,
+    async (req,res) => {
+        const user = await User.findById(req.user.id);
+        user.todos.id(req.params.id);
+        await user.save();
+        res.json({
+            data:{},
+            errors:[],
+            message: 'Todo item delete'
+        });
+    }
+ )
 
 module.exports = router;

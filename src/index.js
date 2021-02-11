@@ -6,6 +6,7 @@ InitMongo();
 
 const userRoutes = require('./routes/user');
 const todoRoutes = require('./routes/todo');
+const bogRoutes = require('./routes/blog');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.get('/',(req,res)=>{
  */
 app.use('/api/user', userRoutes);
 app.use('/api/user/todo', todoRoutes);
+app.use('/api/user/blogs', bogRoutes);
 
 app.use((err,req,res,next)=>{
     console.log(err);
