@@ -8,7 +8,7 @@ const { check, validationResult } = require('express-validator/check')
 const User = require('../schemas/User');
 const auth = require('../middleware/auth');
 const { ObjectId } = require('mongoose');
-
+const users = {};
 /**
  * @method - POST
  * @param  - /signup
@@ -145,30 +145,35 @@ router.post(
      '/profile',
      auth,
     async (req,res) => {
-        try {
-            // const user = await User.findById(req.user.id);
-            const user = await User.aggregate([
-                {
-                    $match: {
-                        _id: mongoose.Types.ObjectId(req.user.id)
+        if(users[req.user.id]) {
+            return res.json(users[req.user.id])
+        } else {
+            try {
+                // const user = await User.findById(req.user.id);
+                const user = await User.aggregate([
+                    {
+                        $match: {
+                            _id: mongoose.Types.ObjectId(req.user.id)
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'blogs',
+                            localField: '_id',
+                            foreignField: 'userId',
+                            as: 'userBlogs'
+                        }
                     }
-                },
-                {
-                    $lookup: {
-                        from: 'blogs',
-                        localField: '_id',
-                        foreignField: 'userId',
-                        as: 'userBlogs'
-                    }
+                ]);
+                users[req.user.id] = {
+                    data:user,
+                    errors:[],
+                    message: 'Fetched user profile'
                 }
-            ]);
-            res.json({
-                data:user,
-                errors:[],
-                message: 'Fetched user profile'
-            })
-        } catch (e) {
-            res.send('Error in fetching')
+                res.json(users[req.user.id])
+            } catch (e) {
+                res.send('Error in fetching')
+            }
         }
     }    
  );
