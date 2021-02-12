@@ -5,7 +5,7 @@ const BlogSchema = mongoose.Schema({
     body: String,
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "user",
         default: null
     },
     createdAt: {

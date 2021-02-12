@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -6,6 +7,7 @@ const { check, validationResult } = require('express-validator/check')
 
 const User = require('../schemas/User');
 const auth = require('../middleware/auth');
+const { ObjectId } = require('mongoose');
 
 /**
  * @method - POST
@@ -144,7 +146,22 @@ router.post(
      auth,
     async (req,res) => {
         try {
-            const user = await User.findById(req.user.id);
+            // const user = await User.findById(req.user.id);
+            const user = await User.aggregate([
+                {
+                    $match: {
+                        _id: mongoose.Types.ObjectId(req.user.id)
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'blogs',
+                        localField: '_id',
+                        foreignField: 'userId',
+                        as: 'userBlogs'
+                    }
+                }
+            ]);
             res.json({
                 data:user,
                 errors:[],

@@ -1,25 +1,18 @@
 const express = require('express');
-const auth = require('../middleware/auth');
-const Blog = require('../schemas/Blog');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const BlogController = require('../controllers/BlogController');
+
+router.get(
+    '/',
+    BlogController.get
+ );
 
 router.post(
     '/',
     auth,
-    async (req,res)=> {
-        const blog = new Blog({
-            title: req.body.title,
-            body: req.body.body,
-            userId: req.user.id
-        });
-        await blog.save();
-        res.json({
-            data:{},
-            errors:[],
-            message: 'Blog created'
-        });
-    }
- )
+    BlogController.create
+ );
 
 
 module.exports = router;
